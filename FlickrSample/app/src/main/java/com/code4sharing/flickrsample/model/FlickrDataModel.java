@@ -8,7 +8,7 @@ public class FlickrDataModel {
     double mLongitude;
     String mPhotoUrl;
     String mTitle;
-    String mPlaceId;
+    String mPhotoId;
     /*
      * getter and setter methods for
      * each items
@@ -49,13 +49,13 @@ public class FlickrDataModel {
     /*
      PlaceId
      */
-    public void setPlaceId(String value)
+    public void setPhotoId(String value)
     {
-        this.mPlaceId=value;
+        this.mPhotoId=value;
     }
-    public String getPlaceId()
+    public String getPhotoId()
     {
-        return this.mPlaceId;
+        return this.mPhotoId;
     }
     /*
      Title

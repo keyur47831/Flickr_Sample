@@ -3,4 +3,6 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="connection_error">Request failed due to connection error.</string>
+    <string name="success">Data fetched successfully</string>
 </resources>

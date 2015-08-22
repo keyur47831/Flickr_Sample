@@ -1,16 +1,26 @@
-package com.code4sharing.flickrsample;
+package com.code4sharing.flickrsample.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.code4sharing.flickrsample.R;
+import com.code4sharing.flickrsample.model.FlickrDataModel;
+import com.code4sharing.flickrsample.presenter.FlickrPresenter;
+
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
+
+    FlickrPresenter mFlickrPresenter;
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_home);
+        mFlickrPresenter=new FlickrPresenter (mRequestFlickrData);
     }
 
     @Override
@@ -29,9 +39,25 @@ public class HomeActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            mFlickrPresenter.loadData();
             return true;
         }
 
         return super.onOptionsItemSelected (item);
     }
+    private FlickrPresenter.onFectFlickrDataRequest mRequestFlickrData = new FlickrPresenter.onFectFlickrDataRequest(){
+
+        @Override
+        public void  onRequestSucess(List<FlickrDataModel> NearByLocation) {
+            Toast.makeText (getApplicationContext (), "DataSize : "+NearByLocation.size (), Toast.LENGTH_SHORT).show();
+
+
+        }
+
+        @Override
+        public void onRequestError() {
+            Toast.makeText (getApplicationContext (), R.string.connection_error, Toast.LENGTH_SHORT).show();
+
+        }
+    };
 }
