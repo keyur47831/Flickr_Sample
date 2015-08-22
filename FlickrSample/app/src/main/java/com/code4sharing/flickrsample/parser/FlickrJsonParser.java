@@ -84,15 +84,15 @@ public class FlickrJsonParser {
                 String photoTitle = getStringFromObject (rowJSON, Constants.PHOTO_TITLE);
                 double latitude=0;
                 String tempLatLng=getStringFromObject (rowJSON, Constants.PHOTO_LATITUDE);
-                if(tempLatLng!=Constants.BLANK_STR) {
+                if(!tempLatLng.isEmpty ()) {
                     latitude = Double.parseDouble (tempLatLng);
                 }
                 double longitude=0;
                 tempLatLng=getStringFromObject (rowJSON, Constants.PHOTO_LONGITUDE);
-                if(tempLatLng!=Constants.BLANK_STR) {
+                if(!tempLatLng.isEmpty ()) {
                     longitude = Double.parseDouble (tempLatLng);
                 }
-
+                //free the object for GC
                 tempLatLng=null;
                 String rowImageHref = getStringFromObject(rowJSON, Constants.PHOTO_URL);
                 flickrModel.setTitle (photoTitle);
@@ -109,6 +109,7 @@ public class FlickrJsonParser {
                 Log.e(TAG, "JSON Exception is caught ####", e);
             }
         }
+        //free the object for GC
         flickrModel=null;
     }
 

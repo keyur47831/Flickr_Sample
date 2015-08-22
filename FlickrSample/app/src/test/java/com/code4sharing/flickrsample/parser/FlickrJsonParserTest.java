@@ -47,7 +47,67 @@ public class FlickrJsonParserTest {
 
         content = getContent (DataSet1);
         factParser.parseFactJsonData (content,factList);
+        assertThat(factList.size()).isEqualTo (2);
+
+    }
+    @Test
+    public void testParseFactJsonDataWithDataSetHavingNullTitle() throws Exception
+    {
+        final String DataSet1 = "src/test/assets/data2.json";
+
+        FlickrJsonParser factParser = new FlickrJsonParser();
+        List<FlickrDataModel> factList = new ArrayList<>();
+
+        String content;
+
+        content = getContent (DataSet1);
+        factParser.parseFactJsonData (content,factList);
         assertThat(factList.size()).isEqualTo(2);
+
+    }
+    @Test
+    public void testParseFactJsonDataWithDataSetHavingNullPhotoURL() throws Exception
+    {
+        final String DataSet1 = "src/test/assets/data3.json";
+
+        FlickrJsonParser factParser = new FlickrJsonParser();
+        List<FlickrDataModel> factList = new ArrayList<>();
+
+        String content;
+
+        content = getContent (DataSet1);
+        factParser.parseFactJsonData (content,factList);
+        assertThat(factList.size()).isEqualTo(2);
+
+    }
+    @Test
+     public void testParseFactJsonDataWithDataSetHavingNullLatLng() throws Exception
+    {
+        final String DataSet1 = "src/test/assets/data4.json";
+
+        FlickrJsonParser factParser = new FlickrJsonParser();
+        List<FlickrDataModel> factList = new ArrayList<>();
+
+        String content;
+
+        content = getContent (DataSet1);
+        factParser.parseFactJsonData (content,factList);
+        assertThat(factList.size()).isEqualTo(2);
+
+    }
+    @Test
+    public void testParseFactJsonDataWithDataSetHavingWrongFormat() throws Exception
+    {
+        final String DataSet1 = "src/test/assets/data5.json";
+
+        FlickrJsonParser factParser = new FlickrJsonParser();
+        List<FlickrDataModel> factList = new ArrayList<>();
+
+        String content;
+
+        content = getContent (DataSet1);
+        factParser.parseFactJsonData (content,factList);
+        assertThat(factList.size()).isEqualTo(0);
 
     }
     private String getContent(String filePath)
