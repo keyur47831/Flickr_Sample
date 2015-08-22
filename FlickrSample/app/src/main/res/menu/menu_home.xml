@@ -2,8 +2,19 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".HomeActivity">
-    <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/current_location"
+        android:orderInCategory="100"
+        android:title="@string/nav_current"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/show_nearby"
+        android:orderInCategory="200"
+        android:title="@string/nav_nearby"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/show_path"
+        android:orderInCategory="300"
+        android:title="@string/nav_path"
+        app:showAsAction="never"/>
 </menu>

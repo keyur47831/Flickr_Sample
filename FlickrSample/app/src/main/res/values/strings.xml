@@ -5,4 +5,13 @@
     <string name="action_settings">Settings</string>
     <string name="connection_error">Request failed due to connection error.</string>
     <string name="success">Data fetched successfully</string>
+    <string name="nav_current">My Current Location</string>
+    <string name="nav_nearby">Nearby Places</string>
+    <string name="nav_path">Show Path</string>
+    <string-array name="nav_draw_item">
+        <item>@string/nav_current</item>
+        <item>@string/nav_nearby</item>
+        <item>@string/nav_path</item>
+    </string-array>
+
 </resources>

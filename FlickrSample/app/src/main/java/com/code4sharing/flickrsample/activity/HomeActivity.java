@@ -2,6 +2,7 @@ package com.code4sharing.flickrsample.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -16,10 +17,15 @@ public class HomeActivity extends AppCompatActivity {
 
 
     FlickrPresenter mFlickrPresenter;
+    private Toolbar mToolbar;
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_home);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        setSupportActionBar(mToolbar);
+        getSupportActionBar().setDisplayShowHomeEnabled (true);
         mFlickrPresenter=new FlickrPresenter (mRequestFlickrData);
     }
 
@@ -38,7 +44,7 @@ public class HomeActivity extends AppCompatActivity {
         int id = item.getItemId ();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.current_location) {
             mFlickrPresenter.loadData();
             return true;
         }
