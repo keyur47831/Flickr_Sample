@@ -19,7 +19,7 @@ import com.google.android.gms.location.LocationServices;
  * Created by keyur on 22-08-2015.
  */
 public class LocationTrackingService extends Service implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener , LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener {
     // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
 
@@ -35,19 +35,24 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
     protected Location mCurrentLocation;
 
     NotifyCurrentLocationChanged mNotifyCurrentLocationChanged;
-    private static final String TAG= LocationTrackingService.class.getSimpleName ();
+    private static final String TAG = LocationTrackingService.class.getSimpleName ();
 
-    public LocationTrackingService(NotifyCurrentLocationChanged PresenterCallBack)
+    public LocationTrackingService (NotifyCurrentLocationChanged PresenterCallBack) {
+        this.mNotifyCurrentLocationChanged = PresenterCallBack;
+    }
+    private LocationTrackingService()
     {
-        this.mNotifyCurrentLocationChanged=PresenterCallBack;
+
     }
-    public synchronized void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(AppController.getInstance ())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-        createLocationRequest();
+
+    public synchronized void buildGoogleApiClient () {
+        mGoogleApiClient = new GoogleApiClient.Builder (AppController.getInstance ())
+                .addConnectionCallbacks (this)
+                .addOnConnectionFailedListener (this)
+                .addApi (LocationServices.API).build ();
+        createLocationRequest ();
     }
+
     /**
      * Sets up the location request. Android has two location request settings:
      * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
@@ -61,8 +66,8 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
      * These settings are appropriate for mapping applications that show real-time location
      * updates.
      */
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
+    protected void createLocationRequest () {
+        mLocationRequest = new LocationRequest ();
 
         // Sets the desired interval for active location updates. This interval is
         // inexact. You may not receive updates at all if no location sources are available, or
@@ -72,31 +77,41 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
 
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(Constants.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setFastestInterval (Constants.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
 
         mLocationRequest.setPriority (LocationRequest.PRIORITY_HIGH_ACCURACY);
-        connectFusedLocationProviderApi();
+        connectFusedLocationProviderApi ();
 
     }
-    public void connectFusedLocationProviderApi()
-    {
-      if(mGoogleApiClient.isConnected ()==false)
-          mGoogleApiClient.connect ();
+
+    public void connectFusedLocationProviderApi () {
+        if (!mGoogleApiClient.isConnected ()) {
+            mGoogleApiClient.connect ();
+            return;
+        }
+        if (mCurrentLocation == null)
+            startLocationUpdates ();
 
     }
+
+    public boolean isServiceRunning () {
+        return mCurrentLocation == null ? false : true;
+    }
+
     /**
      * Requests location updates from the FusedLocationApi.
      */
-    protected void startLocationUpdates() {
+    protected void startLocationUpdates () {
         // The final argument to {@code requestLocationUpdates()} is a LocationListener
         // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
         LocationServices.FusedLocationApi.requestLocationUpdates (
                 mGoogleApiClient, mLocationRequest, this);
     }
+
     /**
      * Removes location updates from the FusedLocationApi.
      */
-    protected void stopLocationUpdates() {
+    protected void stopLocationUpdates () {
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
@@ -111,40 +126,47 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
      * Google api callback methods
      */
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i (TAG, "Connection failed: Error ="
+    public void onConnectionFailed (ConnectionResult result) {
+        Log.e (TAG, "Connection failed: Error ="
                 + result.getErrorCode ());
+        mNotifyCurrentLocationChanged.onLocationFail ();
     }
 
     @Override
-    public void onConnected(Bundle arg0) {
+    public void onConnected (Bundle arg0) {
 
         if (mCurrentLocation == null) {
             mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation (mGoogleApiClient);
-            mNotifyCurrentLocationChanged.onLatLngUpdated (mCurrentLocation);
-            startLocationUpdates ();
-            Log.i (TAG, "Connection success ="
-                    + mCurrentLocation.getLongitude ()+":"+mCurrentLocation.getLatitude ());
+            if (mCurrentLocation != null) {
+                mNotifyCurrentLocationChanged.onLatLngUpdated (mCurrentLocation);
+                startLocationUpdates ();
+                Log.e (TAG, "Connection success ="
+                        + mCurrentLocation.getLongitude () + ":" + mCurrentLocation.getLatitude ());
+            } else
+                mNotifyCurrentLocationChanged.onLocationFail ();
         }
 
     }
 
     @Override
-    public void onConnectionSuspended(int arg0) {
-        mGoogleApiClient.connect();
+    public void onConnectionSuspended (int arg0) {
+        mGoogleApiClient.connect ();
     }
+
     @Override
-    public IBinder onBind(Intent arg0) {
+    public IBinder onBind (Intent arg0) {
         return null;
     }
+
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged (Location location) {
         mCurrentLocation = location;
         mNotifyCurrentLocationChanged.onLatLngUpdated (mCurrentLocation);
 
     }
-    public interface NotifyCurrentLocationChanged
-    {
-        public void onLatLngUpdated(Location newLocation);
+
+    public interface NotifyCurrentLocationChanged {
+         void onLatLngUpdated (Location newLocation);
+         void onLocationFail ();
     }
 }

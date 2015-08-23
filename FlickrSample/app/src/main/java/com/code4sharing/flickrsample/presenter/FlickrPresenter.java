@@ -28,97 +28,95 @@ public class FlickrPresenter {
     List<FlickrDataModel> mNearByLocation;
     RequestQueue mRequestQueue;
     onFectFlickrDataRequest mFlickrRequestListener;
-    public static final String TAG=FlickrPresenter.class.getSimpleName ();
+    public static final String TAG = FlickrPresenter.class.getSimpleName ();
     private LocationTrackingService mLocationService;
     private MapRequestCallBacks onUserLocationUpdated;
-    public FlickrPresenter(onFectFlickrDataRequest ActivityCallback,MapRequestCallBacks MainActivityCallback)
-    {
-        mRequestQueue=AppController.getInstance ().getRequestQueue ();
-        this.mFlickrRequestListener =ActivityCallback;
-         mNearByLocation=new ArrayList<> ();
-        mLocationService=new LocationTrackingService (mLocationListener);
-        mLocationService.buildGoogleApiClient();
 
-        this.onUserLocationUpdated=MainActivityCallback;
+
+    public FlickrPresenter (onFectFlickrDataRequest ActivityCallback, MapRequestCallBacks MainActivityCallback) {
+        mRequestQueue = AppController.getInstance ().getRequestQueue ();
+        this.mFlickrRequestListener = ActivityCallback;
+        mNearByLocation = new ArrayList<> ();
+        mLocationService = new LocationTrackingService (mLocationListener);
+        mLocationService.buildGoogleApiClient ();
+        this.onUserLocationUpdated = MainActivityCallback;
+    }
+
+    public void reconnetService () {
+        if (!mLocationService.isServiceRunning ()) {
+            mLocationService.connectFusedLocationProviderApi ();
+        }
 
     }
+
     /**
      * Download data from network by adding request in volley request queue
      * and populate data list
      */
-    public void loadData()
-    {
-
-        final FlickrJsonParser parser = new FlickrJsonParser();
-
+    public void loadData () {
+        final FlickrJsonParser parser = new FlickrJsonParser ();
         // We first check for cached request
-        Cache cache = mRequestQueue.getCache();
-        Cache.Entry entry = cache.get(Constants.FLICKR_URL);
-        if (entry != null)
-        {
+        Cache cache = mRequestQueue.getCache ();
+        Cache.Entry entry = cache.get (Constants.FLICKR_URL);
+        if (entry != null) {
             // fetch the data from cache
-            try
-            {
-                String data = new String(entry.data,"UTF-8");
+            try {
+                String data = new String (entry.data, "UTF-8");
                 parser.parseFactJsonData (data, mNearByLocation);
 
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 Log.d (TAG, "Error parsing data", e);
             }
-        }
-        else
-        {
-            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>()
-            {
+        } else {
+            Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject> () {
                 @Override
-                public void onResponse(JSONObject response)
-                {
-                    Log.d(TAG, "Volley Response: " + response.toString());
-                    if (response != null)
-                    {
-                        parser.parseFactJsonData (response.toString (), mNearByLocation);
-                        if(mNearByLocation.isEmpty ())
-                            mFlickrRequestListener.onRequestError ();
-                        else
-                            mFlickrRequestListener.onRequestSucess (mNearByLocation);
-                    }
+                public void onResponse (JSONObject response) {
+                    Log.d (TAG, "Volley Response: " + response.toString ());
+                    parser.parseFactJsonData (response.toString (), mNearByLocation);
+                    if (mNearByLocation.isEmpty ())
+                        mFlickrRequestListener.onRequestError ();
+                    else
+                        mFlickrRequestListener.onRequestSucess (mNearByLocation);
                 }
             };
 
-            Response.ErrorListener errorListener = new Response.ErrorListener()
-            {
+            Response.ErrorListener errorListener = new Response.ErrorListener () {
                 @Override
-                public void onErrorResponse(VolleyError error)
-                {
+                public void onErrorResponse (VolleyError error) {
                     mFlickrRequestListener.onRequestError ();
                 }
             };
-            JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
+            JsonObjectRequest jsonReq = new JsonObjectRequest (Request.Method.GET,
                     Constants.FLICKR_URL, responseListener, errorListener);
 
             //Setting TAG if in future request needs to be cancelled.
-            jsonReq.setTag(TAG);
+            jsonReq.setTag (TAG);
 
             // Adding request to volley request queue
-            mRequestQueue.add(jsonReq);
+            mRequestQueue.add (jsonReq);
         }
     }
-     public interface onFectFlickrDataRequest{
-         void onRequestSucess(List<FlickrDataModel> NearByLocation);
-         void onRequestError();
-     }
-    public interface MapRequestCallBacks
-    {
-        void onCurrentLocationUpdated(Location data);
+
+    public interface onFectFlickrDataRequest {
+        void onRequestSucess (List<FlickrDataModel> NearByLocation);
+
+        void onRequestError ();
     }
-    private  LocationTrackingService.NotifyCurrentLocationChanged mLocationListener=new LocationTrackingService.NotifyCurrentLocationChanged()
-    {
+
+    public interface MapRequestCallBacks {
+        void onCurrentLocationUpdated (Location data);
+
+        void onCurrenLocationFailed ();
+    }
+
+    private LocationTrackingService.NotifyCurrentLocationChanged mLocationListener = new LocationTrackingService.NotifyCurrentLocationChanged () {
         @Override
-        public void onLatLngUpdated(Location data)
-        {
+        public void onLatLngUpdated (Location data) {
             onUserLocationUpdated.onCurrentLocationUpdated (data);
+        }
+
+        public void onLocationFail () {
+            onUserLocationUpdated.onCurrenLocationFailed ();
         }
     };
 
