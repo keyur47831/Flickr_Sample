@@ -71,7 +71,7 @@ public class FlickrJsonParser {
             Log.e(TAG, "Input params should not be null");
             return ;
         }
-        FlickrDataModel flickrModel = new FlickrDataModel();
+
         //clear the data list
         dataList.clear();
         int lenght=rows.length();
@@ -95,6 +95,7 @@ public class FlickrJsonParser {
                 //free the object for GC
                 tempLatLng=null;
                 String rowImageHref = getStringFromObject(rowJSON, Constants.PHOTO_URL);
+                FlickrDataModel flickrModel = new FlickrDataModel();
                 flickrModel.setTitle (photoTitle);
                 flickrModel.setPhotoId (photoID);
                 flickrModel.setPhotoUrl (rowImageHref);
@@ -102,15 +103,14 @@ public class FlickrJsonParser {
                 flickrModel.setLongitude (longitude);
 
                 dataList.add (flickrModel);
-                Log.e (TAG, flickrModel.getTitle ()+"keyur");
+
             }
             catch (JSONException e)
             {
                 Log.e(TAG, "JSON Exception is caught ####", e);
             }
         }
-        //free the object for GC
-        flickrModel=null;
+
     }
 
     private String getStringFromObject(JSONObject rowJSON, String element)

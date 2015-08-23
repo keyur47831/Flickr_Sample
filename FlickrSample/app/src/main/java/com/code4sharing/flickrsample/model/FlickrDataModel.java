@@ -1,5 +1,9 @@
 package com.code4sharing.flickrsample.model;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Comparator;
+
 /**
  * Created by keyur on 22-08-2015.
  */
@@ -69,6 +73,30 @@ public class FlickrDataModel {
         return this.mTitle;
     }
 
+    /*
+       * We create a Comparator function to compare the near most point.
+       * We need to find the near most point from given point
+       * in order to draw line on map
+       */
+    public static Comparator<LatLng> createComparator(LatLng p)
+    {
+        final LatLng finalP = new LatLng (p.latitude,p.longitude);
+        return new Comparator<LatLng>()
+        {
+            @Override
+            public int compare(LatLng p0, LatLng p1)
+            {
+                float[] result1 = new float[1];
+                float[] result2 = new float[1];
+                //User android standard function to
+                //find the nearmost in given
+                //collection of LatLng
+                android.location.Location.distanceBetween(finalP.latitude, finalP.longitude, p0.latitude, p0.longitude, result1);
+                android.location.Location.distanceBetween(finalP.latitude, finalP.longitude, p1.latitude, p1.longitude, result2);
+                return Double.compare (result1[0],result2[0]);
+            }
 
+        };
+    }
 
 }

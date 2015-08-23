@@ -1,5 +1,6 @@
 package com.code4sharing.flickrsample.presenter;
 
+import android.location.Location;
 import android.util.Log;
 
 import com.android.volley.Cache;
@@ -11,6 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.code4sharing.flickrsample.activity.AppController;
 import com.code4sharing.flickrsample.model.FlickrDataModel;
 import com.code4sharing.flickrsample.parser.FlickrJsonParser;
+import com.code4sharing.flickrsample.service.LocationTrackingService;
 import com.code4sharing.flickrsample.util.Constants;
 
 import org.json.JSONObject;
@@ -27,12 +29,17 @@ public class FlickrPresenter {
     RequestQueue mRequestQueue;
     onFectFlickrDataRequest mFlickrRequestListener;
     public static final String TAG=FlickrPresenter.class.getSimpleName ();
-
-    public FlickrPresenter(onFectFlickrDataRequest ActivityCallback)
+    private LocationTrackingService mLocationService;
+    private MapRequestCallBacks onUserLocationUpdated;
+    public FlickrPresenter(onFectFlickrDataRequest ActivityCallback,MapRequestCallBacks MainActivityCallback)
     {
         mRequestQueue=AppController.getInstance ().getRequestQueue ();
         this.mFlickrRequestListener =ActivityCallback;
          mNearByLocation=new ArrayList<> ();
+        mLocationService=new LocationTrackingService (mLocationListener);
+        mLocationService.buildGoogleApiClient();
+
+        this.onUserLocationUpdated=MainActivityCallback;
 
     }
     /**
@@ -73,9 +80,9 @@ public class FlickrPresenter {
                     {
                         parser.parseFactJsonData (response.toString (), mNearByLocation);
                         if(mNearByLocation.isEmpty ())
-                        mFlickrRequestListener.onRequestError ();
+                            mFlickrRequestListener.onRequestError ();
                         else
-                         mFlickrRequestListener.onRequestSucess (mNearByLocation);
+                            mFlickrRequestListener.onRequestSucess (mNearByLocation);
                     }
                 }
             };
@@ -88,7 +95,6 @@ public class FlickrPresenter {
                     mFlickrRequestListener.onRequestError ();
                 }
             };
-
             JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET,
                     Constants.FLICKR_URL, responseListener, errorListener);
 
@@ -103,6 +109,18 @@ public class FlickrPresenter {
          void onRequestSucess(List<FlickrDataModel> NearByLocation);
          void onRequestError();
      }
+    public interface MapRequestCallBacks
+    {
+        void onCurrentLocationUpdated(Location data);
+    }
+    private  LocationTrackingService.NotifyCurrentLocationChanged mLocationListener=new LocationTrackingService.NotifyCurrentLocationChanged()
+    {
+        @Override
+        public void onLatLngUpdated(Location data)
+        {
+            onUserLocationUpdated.onCurrentLocationUpdated (data);
+        }
+    };
 
 
 }
