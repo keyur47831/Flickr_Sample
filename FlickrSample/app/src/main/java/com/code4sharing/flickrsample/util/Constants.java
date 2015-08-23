@@ -13,4 +13,7 @@ public class Constants {
     public static final String PHOTO_LATITUDE="latitude";
     public static final String PHOTO_LONGITUDE="longitude";
     public static final String PHOTO_URL="url_t";
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 }

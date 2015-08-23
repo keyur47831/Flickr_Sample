@@ -8,6 +8,7 @@
     <string name="nav_current">My Current Location</string>
     <string name="nav_nearby">Nearby Places</string>
     <string name="nav_path">Show Path</string>
+    <string name="here">You are here</string>
     <string-array name="nav_draw_item">
         <item>@string/nav_current</item>
         <item>@string/nav_nearby</item>
