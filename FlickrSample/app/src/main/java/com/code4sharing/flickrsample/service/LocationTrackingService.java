@@ -17,6 +17,8 @@ import com.google.android.gms.location.LocationServices;
 
 /**
  * Created by keyur on 22-08-2015.
+ * This class creates our Location Service.
+ * This service implements the FusedLocationAPI
  */
 public class LocationTrackingService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -33,18 +35,23 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
      * Represents a geographical location.
      */
     protected Location mCurrentLocation;
-
+    //Interface for callback
     NotifyCurrentLocationChanged mNotifyCurrentLocationChanged;
+    //for logs
     private static final String TAG = LocationTrackingService.class.getSimpleName ();
 
+    /**
+     * Constructur for location service
+     * @param PresenterCallBack callback interface for notification
+     */
     public LocationTrackingService (NotifyCurrentLocationChanged PresenterCallBack) {
         this.mNotifyCurrentLocationChanged = PresenterCallBack;
     }
-    private LocationTrackingService()
-    {
 
-    }
-
+    /**
+     * This function will build
+     * Googleapi client
+     */
     public synchronized void buildGoogleApiClient () {
         mGoogleApiClient = new GoogleApiClient.Builder (AppController.getInstance ())
                 .addConnectionCallbacks (this)
@@ -55,14 +62,9 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
 
     /**
      * Sets up the location request. Android has two location request settings:
-     * {@code ACCESS_COARSE_LOCATION} and {@code ACCESS_FINE_LOCATION}. These settings control
-     * the accuracy of the current location. This sample uses ACCESS_FINE_LOCATION, as defined in
-     * the AndroidManifest.xml.
-     * <p/>
      * When the ACCESS_FINE_LOCATION setting is specified, combined with a fast update
      * interval (5 seconds), the Fused Location Provider API returns location updates that are
      * accurate to within a few feet.
-     * <p/>
      * These settings are appropriate for mapping applications that show real-time location
      * updates.
      */
@@ -84,16 +86,26 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
 
     }
 
+    /**
+     * Connect method wrapper
+     */
     public void connectFusedLocationProviderApi () {
         if (!mGoogleApiClient.isConnected ()) {
             mGoogleApiClient.connect ();
             return;
         }
         if (mCurrentLocation == null)
+            //if current location is null
+            // start listening for locaiton
+           //changes
             startLocationUpdates ();
 
     }
 
+    /**
+     * This function returns the service status
+     * @return status of service
+     */
     public boolean isServiceRunning () {
         return mCurrentLocation == null ? false : true;
     }
@@ -103,7 +115,6 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
      */
     protected void startLocationUpdates () {
         // The final argument to {@code requestLocationUpdates()} is a LocationListener
-        // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
         LocationServices.FusedLocationApi.requestLocationUpdates (
                 mGoogleApiClient, mLocationRequest, this);
     }
@@ -111,7 +122,7 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
     /**
      * Removes location updates from the FusedLocationApi.
      */
-    protected void stopLocationUpdates () {
+    public  void stopLocationUpdates () {
         // It is a good practice to remove location requests when the activity is in a paused or
         // stopped state. Doing so helps battery performance and is especially
         // recommended in applications that request frequent location updates.
@@ -120,6 +131,8 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
         // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
         LocationServices.FusedLocationApi.removeLocationUpdates (mGoogleApiClient, this);
         mGoogleApiClient.disconnect ();
+        //Ensure we always get lastest location
+        mCurrentLocation=null;
     }
 
     /**
@@ -165,6 +178,9 @@ public class LocationTrackingService extends Service implements GoogleApiClient.
 
     }
 
+    /**\
+     * Interface to notify updates
+     */
     public interface NotifyCurrentLocationChanged {
          void onLatLngUpdated (Location newLocation);
          void onLocationFail ();

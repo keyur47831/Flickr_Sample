@@ -6,6 +6,10 @@ import java.util.Comparator;
 
 /**
  * Created by keyur on 22-08-2015.
+ * The data model required for our project
+ * Currently we are not displaying
+ * the title on infowindow but we can
+ * customised it on requirement
  */
 public class FlickrDataModel {
     double mLatitude;

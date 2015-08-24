@@ -26,10 +26,13 @@ public class FlickrJsonParser {
      * @return Title of the data
      */
     public void parseFactJsonData (@NonNull String jsonString, @NonNull List<FlickrDataModel> dataList) {
+        //error handling
         if (jsonString == null || jsonString.isEmpty ()) {
             Log.e (TAG, "Json Data or the list to be populated should not be null");
             return;
         }
+        //All the constants are defined
+        //in single file
         try {
             JSONObject jsonObject = new JSONObject (jsonString);
             if (jsonObject.has (Constants.PHOTOS_TAG)) {
@@ -54,6 +57,7 @@ public class FlickrJsonParser {
     private void parseJsonRows (@NonNull JSONArray rows, @NonNull List<FlickrDataModel> dataList) {
         //clear the data list
         dataList.clear ();
+
         int lenght = rows.length ();
         for (int i = 0; i < lenght; i++) {
             try {
@@ -62,6 +66,7 @@ public class FlickrJsonParser {
                 String photoTitle = getStringFromObject (rowJSON, Constants.PHOTO_TITLE);
                 double latitude = 0;
                 String tempLatLng = getStringFromObject (rowJSON, Constants.PHOTO_LATITUDE);
+                //error handling for null value
                 if (!tempLatLng.isEmpty ()) {
                     latitude = Double.parseDouble (tempLatLng);
                 }
@@ -73,6 +78,7 @@ public class FlickrJsonParser {
                 //free the object for GC
                 tempLatLng = null;
                 String rowImageHref = getStringFromObject (rowJSON, Constants.PHOTO_URL);
+                //add this to our ModelData List
                 FlickrDataModel flickrModel = new FlickrDataModel ();
                 flickrModel.setTitle (photoTitle);
                 flickrModel.setPhotoId (photoID);
@@ -88,6 +94,12 @@ public class FlickrJsonParser {
 
     }
 
+    /**
+     *
+     * @param rowJSON JSONObjec to be parsed
+     * @param element element string
+     * @return value of element from JSON
+     */
     private String getStringFromObject (JSONObject rowJSON, String element) {
         try {
             if (rowJSON.has (element)) {

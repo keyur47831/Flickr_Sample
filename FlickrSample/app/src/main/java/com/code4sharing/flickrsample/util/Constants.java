@@ -2,6 +2,8 @@ package com.code4sharing.flickrsample.util;
 
 /**
  * Created by keyur on 22-08-2015.
+ * We assemble all the contants
+ * in one file.
  */
 public class Constants {
     public static final String FLICKR_URL="https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=d30642e62e21f360e830d9045fac62c5&lat=-37.872160&lon=144.989943&extras=geo%2Curl_s&format=json&nojsoncallback=1&per_page=100&page=1";

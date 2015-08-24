@@ -23,31 +23,67 @@ import java.util.List;
 
 /**
  * Created by keyur on 22-08-2015.
+ * This is our presenter class
+ * This class acts as single communication
+ * channel with our Activity
  */
 public class FlickrPresenter {
+    //list of nearby markers
     List<FlickrDataModel> mNearByLocation;
+    //Vollery request queue
     RequestQueue mRequestQueue;
+    //callback for flickr fetch reqest
     onFectFlickrDataRequest mFlickrRequestListener;
+    //for logs
     public static final String TAG = FlickrPresenter.class.getSimpleName ();
+    //We take callback from service
+    //and pass data to our Activity
     private LocationTrackingService mLocationService;
     private MapRequestCallBacks onUserLocationUpdated;
 
-
+    /**
+     * Constructor of our class
+     * @param ActivityCallback callback for flickr fetch request
+     * @param MainActivityCallback callback for location data
+     */
     public FlickrPresenter (onFectFlickrDataRequest ActivityCallback, MapRequestCallBacks MainActivityCallback) {
+        //init volley request queue
         mRequestQueue = AppController.getInstance ().getRequestQueue ();
+        //flickr fetch request callback
         this.mFlickrRequestListener = ActivityCallback;
+        //init arraylists
         mNearByLocation = new ArrayList<> ();
+        //init our locaiton service
         mLocationService = new LocationTrackingService (mLocationListener);
+        //build googleapi client for locaiton
+        //request
         mLocationService.buildGoogleApiClient ();
+        //location update callback
         this.onUserLocationUpdated = MainActivityCallback;
     }
 
+    /**
+     * This function is used to re-connect service in case of
+     * error
+     */
     public void reconnetService () {
         if (!mLocationService.isServiceRunning ()) {
             mLocationService.connectFusedLocationProviderApi ();
         }
-
     }
+    /**
+     * This function is used to share service status
+     */
+    public boolean isServiceRunning() {
+        return mLocationService.isServiceRunning ();
+    }
+    /**
+     * This function is used to disconnect service status
+     */
+    public void disconnectService() {
+        mLocationService.stopLocationUpdates();
+    }
+
 
     /**
      * Download data from network by adding request in volley request queue
@@ -72,11 +108,13 @@ public class FlickrPresenter {
                 @Override
                 public void onResponse (JSONObject response) {
                     Log.d (TAG, "Volley Response: " + response.toString ());
+                    //send the data for parsing
                     parser.parseFactJsonData (response.toString (), mNearByLocation);
+                    //notify to Activity
                     if (mNearByLocation.isEmpty ())
                         mFlickrRequestListener.onRequestError ();
                     else
-                        mFlickrRequestListener.onRequestSucess (mNearByLocation);
+                        mFlickrRequestListener.onRequestSuccess (mNearByLocation);
                 }
             };
 
@@ -86,6 +124,7 @@ public class FlickrPresenter {
                     mFlickrRequestListener.onRequestError ();
                 }
             };
+            //we add the request to volley
             JsonObjectRequest jsonReq = new JsonObjectRequest (Request.Method.GET,
                     Constants.FLICKR_URL, responseListener, errorListener);
 
@@ -97,18 +136,26 @@ public class FlickrPresenter {
         }
     }
 
+    /**
+     * Interface for Flickr data request
+     */
     public interface onFectFlickrDataRequest {
-        void onRequestSucess (List<FlickrDataModel> NearByLocation);
+        void onRequestSuccess (List<FlickrDataModel> NearByLocation);
 
         void onRequestError ();
     }
 
+    /**
+     * Interface for Location Request
+     */
     public interface MapRequestCallBacks {
         void onCurrentLocationUpdated (Location data);
-
         void onCurrenLocationFailed ();
     }
 
+    /**
+     * We receive callback from Location Service
+     */
     private LocationTrackingService.NotifyCurrentLocationChanged mLocationListener = new LocationTrackingService.NotifyCurrentLocationChanged () {
         @Override
         public void onLatLngUpdated (Location data) {
