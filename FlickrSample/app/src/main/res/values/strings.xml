@@ -12,6 +12,10 @@
     <string name="gps_error">Unable to get location. Ensure that GPS is enabled</string>
     <string name="select_marker">Please select any location point on map</string>
     <string name="info_window">Please select any marker on map</string>
+    <string name="connection">connection</string>
+    <string name="setting">Settings</string>
+    <string name="gps">gps</string>
+    <string name="dismiss">Dismiss</string>
     <string-array name="nav_draw_item">
         <item>@string/nav_current</item>
         <item>@string/nav_nearby</item>

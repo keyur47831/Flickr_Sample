@@ -1,14 +1,17 @@
 package com.code4sharing.flickrsample.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
+import android.provider.Settings;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
+import android.view.View;
 import com.code4sharing.flickrsample.R;
 import com.code4sharing.flickrsample.adapter.CustomInfoWindowAdapter;
 import com.code4sharing.flickrsample.model.FlickrDataModel;
@@ -23,7 +26,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements OnMapReadyCallback {
     FlickrPresenter mFlickrPresenter;
-
+    CoordinatorLayout mSnackbarLayout;
     private Toolbar mToolbar;
     private GoogleMap mGoogleMap;
     private Location mCurrentLocation;
@@ -52,9 +54,9 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment = (MapFragment) getFragmentManager ()
                 .findFragmentById (R.id.map);
         mFlickrPresenter = new FlickrPresenter (mRequestFlickrData, mRequestLocationData);
+        mSnackbarLayout =(CoordinatorLayout)findViewById (R.id.snackbar);
         initMap ();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu (Menu menu) {
@@ -93,7 +95,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public void onRequestError () {
-            Toast.makeText (getApplicationContext (), R.string.connection_error, Toast.LENGTH_SHORT).show ();
+            //Toast.makeText (getApplicationContext (), R.string.connection_error, Toast.LENGTH_SHORT).show ();
+            mSnackbarLayout.setTag(getString(R.string.connection));
+            Snackbar.make (mSnackbarLayout, getString (R.string.connection_error), Snackbar.LENGTH_LONG)
+                    .setActionTextColor (Color.RED)
+                    .setAction(getString(R.string.setting), mOnClickListener)
+                    .show();
 
         }
     };
@@ -123,7 +130,12 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         public void onCurrenLocationFailed () {
-            Toast.makeText (getApplicationContext (), R.string.gps_error, Toast.LENGTH_SHORT).show ();
+           // Toast.makeText (getApplicationContext (), R.string.gps_error, Toast.LENGTH_SHORT).show ();
+            mSnackbarLayout.setTag (getString(R.string.gps));
+            Snackbar.make (mSnackbarLayout, getString (R.string.gps_error), Snackbar.LENGTH_LONG)
+                    .setActionTextColor (Color.RED)
+                    .setAction(getString(R.string.setting), mOnClickListener)
+                    .show();
         }
     };
 
@@ -182,7 +194,11 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 polylineOptions.width (5);
                 mCurrentSelection = CustomInfoWindowAdapter.mCurrentMarker;
                 if (mCurrentSelection == null) {
-                    Toast.makeText (getApplicationContext (), R.string.select_marker, Toast.LENGTH_SHORT).show ();
+                    mSnackbarLayout.setTag (getString(R.string.dismiss));
+                    Snackbar.make (findViewById (android.R.id.content), getString (R.string.gps_error), Snackbar.LENGTH_LONG)
+                            .setActionTextColor (Color.RED)
+                            .setAction (getString(R.string.dismiss), mOnClickListener)
+                            .show ();
                     return;
                 }
                 LatLng current = mCurrentSelection;
@@ -195,8 +211,31 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 polylineOptions.add (current);
                 mGoogleMap.addPolyline (polylineOptions);
-            } else
-                Toast.makeText (getApplicationContext (), R.string.connection_error, Toast.LENGTH_SHORT).show ();
+            } else {
+                mSnackbarLayout.setTag (getString(R.string.connection));
+                Snackbar.make (mSnackbarLayout, getString (R.string.connection_error), Snackbar.LENGTH_LONG)
+                        .setActionTextColor (Color.RED)
+                        .setAction (getString (R.string.setting), mOnClickListener)
+                        .show ();
+            }
+               
         }
     }
+    View.OnClickListener mOnClickListener =new View.OnClickListener () {
+        @Override
+        public void onClick (View view) {
+
+
+            if(mSnackbarLayout.getTag ()==getString (R.string.connection)) {
+                Intent intent = new Intent (Settings.ACTION_SETTINGS);
+                startActivity (intent);
+            }
+            else if (mSnackbarLayout.getTag ()==getString (R.string.gps)){
+                Intent callGPSSettingIntent = new Intent (
+                        android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                startActivity (callGPSSettingIntent);
+            }
+        }
+    };
+
 }
