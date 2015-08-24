@@ -218,7 +218,7 @@ public class HomeActivity extends AppCompatActivity implements OnMapReadyCallbac
                         .setAction (getString (R.string.setting), mOnClickListener)
                         .show ();
             }
-               
+
         }
     }
     View.OnClickListener mOnClickListener =new View.OnClickListener () {
